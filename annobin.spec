@@ -12,12 +12,15 @@
 %global with_hard_gcc_version_requirement 1
 
 Name:    annobin
-Version: 8.23
-Release: 2
+Version: 10.66
+Release: 1
 Summary: Binary annotation plugin for GCC
 License: GPLv3+
 URL:     https://fedoraproject.org/wiki/Toolchain/Watermark
 Source:  https://nickc.fedorapeople.org/annobin-%{version}.tar.xz
+%ifarch riscv64
+Patch1:  fix-riscv64-abi.patch
+%endif
 # For the latest sources use:  git clone git://sourceware.org/git/annobin.git
 BuildRequires: gcc gcc-plugin-devel gcc-c++
 
@@ -68,16 +71,16 @@ Man pages and other related documents for annobin
 
 %prep
 %autosetup -p1
-touch aclocal.m4 plugin/config.h.in
+touch aclocal.m4 gcc-plugin/config.h.in
 touch configure */configure Makefile.in */Makefile.in
 touch doc/annobin.info
 
 %build
 %configure --quiet --with-gcc-plugin-dir=%{ANNOBIN_PLUGIN_DIR}
 %make_build
-cp plugin/.libs/annobin.so.0.0.0 %{_tmppath}/tmp-annobin.so
-make -C plugin clean
-make -C plugin CXXFLAGS="%{optflags} -fplugin=%{_tmppath}/tmp-annobin.so"
+cp gcc-plugin/.libs/annobin.so.0.0.0 %{_tmppath}/tmp-annobin.so
+make -C gcc-plugin clean
+make -C gcc-plugin CXXFLAGS="%{optflags} -fplugin=%{_tmppath}/tmp-annobin.so"
 rm %{_tmppath}/tmp-annobin.so
 
 %install
@@ -91,10 +94,6 @@ make check
 
 %files
 %{ANNOBIN_PLUGIN_DIR}
-%{_bindir}/built-by
-%{_bindir}/check-abi
-%{_bindir}/hardened
-%{_bindir}/run-on-binaries-in
 %license COPYING3 LICENSE
 %exclude %{_datadir}/doc/annobin-plugin/COPYING3
 %exclude %{_datadir}/doc/annobin-plugin/LICENSE
@@ -104,6 +103,8 @@ make check
 %if %{with annocheck}
 %{_bindir}/annocheck
 %doc %{_mandir}/man1/annocheck.1.gz
+%{_includedir}/libannocheck.h
+%{_libdir}/libannocheck.*
 %endif
 
 %files help
@@ -114,6 +115,10 @@ make check
 %doc %{_mandir}/man1/run-on-binaries-in.1.gz
 
 %changelog
+* Sun Apr 17 2022 YukariChiba <i@0x7f.cc> - 10.66-1
+- Upgrade version to 10.66
+- Fix 999_illegal_reference_to_global_options due to lookup global_options.x_riscv_abi for POINTER_SIZE
+
 * Thu Feb 13 2020 openEuler Buildteam <buildteam@openeuler.org> - 8.23-2
 - Package init
 

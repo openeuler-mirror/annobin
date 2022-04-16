@@ -1,0 +1,12 @@
+diff --color -urN annobin-10.66-old/gcc-plugin/dummy.annobin.cc annobin-10.66/gcc-plugin/dummy.annobin.cc
+--- annobin-10.66-old/gcc-plugin/dummy.annobin.cc	2022-04-20 02:26:45.236972367 +0800
++++ annobin-10.66/gcc-plugin/dummy.annobin.cc	2022-04-20 02:27:02.662927958 +0800
+@@ -35,7 +35,7 @@
+ annobin_get_target_pointer_size (void)
+ {
+   // FIXME: Testing POINTER_SIZE may not be reliable.
+-  return POINTER_SIZE;
++  return 64;
+ }
+ 
+ int
