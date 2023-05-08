@@ -13,7 +13,7 @@
 
 Name:    annobin
 Version: 8.23
-Release: 2
+Release: 3
 Summary: Binary annotation plugin for GCC
 License: GPLv3+
 URL:     https://fedoraproject.org/wiki/Toolchain/Watermark
@@ -77,7 +77,11 @@ touch doc/annobin.info
 %make_build
 cp plugin/.libs/annobin.so.0.0.0 %{_tmppath}/tmp-annobin.so
 make -C plugin clean
+%if "%toolchain" == "clang"
+make -C plugin CXXFLAGS="%{optflags} "
+%else
 make -C plugin CXXFLAGS="%{optflags} -fplugin=%{_tmppath}/tmp-annobin.so"
+%endif
 rm %{_tmppath}/tmp-annobin.so
 
 %install
@@ -114,6 +118,9 @@ make check
 %doc %{_mandir}/man1/run-on-binaries-in.1.gz
 
 %changelog
+* Mon May 08 2023 Xiang Zhang <zhangxiang@iscas.ac.cn> - 8.23-3
+-Fix clang build error
+
 * Thu Feb 13 2020 openEuler Buildteam <buildteam@openeuler.org> - 8.23-2
 - Package init
 
